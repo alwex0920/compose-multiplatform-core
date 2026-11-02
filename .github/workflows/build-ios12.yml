@@ -1,8 +1,10 @@
 name: Build iOS12 Compose
+
 on:
   push:
     branches: ['**']
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: macos-14
@@ -13,15 +15,27 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - run: xcodebuild -version && ./gradlew --version
-      - run: ./gradlew :skiko:linkDebugFrameworkIosArm64 --stacktrace 2>&1 | tee skiko-build.log
+
+      - name: Show versions
+        run: |
+          xcodebuild -version
+          ./gradlew --version
+
+      - name: Build Compose UI framework for iOS (correct path)
+        run: |
+          ./gradlew :compose:ui:ui:linkDebugFrameworkIosArm64 --stacktrace 2>&1 | tee compose-ui-build.log
         continue-on-error: true
-      - run: ./gradlew :compose:ui:linkDebugFrameworkIosArm64 --stacktrace 2>&1 | tee compose-ui-build.log
+
+      - name: Build XCFramework for iOS (correct path)
+        run: |
+          ./gradlew :compose:ui:ui:assembleDebugXCFramework --stacktrace 2>&1 | tee xcframework-build.log
         continue-on-error: true
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload logs
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: build-logs
           path: |
-            skiko-build.log
             compose-ui-build.log
+            xcframework-build.log
