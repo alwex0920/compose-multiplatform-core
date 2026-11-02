@@ -31,8 +31,10 @@ jobs:
       - name: Locate built framework
         if: always()
         run: |
-          echo "=== Searching for ComposeUI.framework ==="
+          echo "=== Searching for any .framework directory ==="
           find . -name "*.framework" -type d 2>/dev/null | head -20
+          echo "=== Expected module path ==="
+          ls -la compose/ui/ui/build/bin/iosArm64/debugFramework/ 2>/dev/null || echo "Path not found"
 
       - name: Upload framework
         if: always()
@@ -40,8 +42,9 @@ jobs:
         with:
           name: compose-ui-framework
           path: |
-            **/build/bin/iosArm64/debugFramework/**/*.framework/**
-          if-no-files-found: warn
+            compose/ui/ui/build/bin/iosArm64/debugFramework/**/*.framework/**
+            compose/ui/ui/build/bin/iosArm64/debugFramework/*.framework
+          if-no-files-found: error
 
       - name: Upload logs
         if: always()
