@@ -23,32 +23,50 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Build Compose UI framework (device arm64)
+      - name: Publish iOS-12 patched Compose to Maven Local
+        env:
+          COMPOSE_CUSTOM_VERSION: 1.0.0-ios12
         run: |
-          ./gradlew :compose:ui:ui:linkDebugFrameworkIosArm64 --stacktrace 2>&1 | tee compose-ui-build.log
-        continue-on-error: true
+          ./gradlew \
+            :compose:runtime:runtime:publishToMavenLocal \
+            :compose:runtime:runtime-saveable:publishToMavenLocal \
+            :compose:ui:ui:publishToMavenLocal \
+            :compose:ui:ui-geometry:publishToMavenLocal \
+            :compose:ui:ui-graphics:publishToMavenLocal \
+            :compose:ui:ui-text:publishToMavenLocal \
+            :compose:ui:ui-unit:publishToMavenLocal \
+            :compose:ui:ui-util:publishToMavenLocal \
+            :compose:foundation:foundation:publishToMavenLocal \
+            :compose:foundation:foundation-layout:publishToMavenLocal \
+            :compose:material:material:publishToMavenLocal \
+            :compose:material3:material3:publishToMavenLocal \
+            :compose:animation:animation:publishToMavenLocal \
+            --stacktrace 2>&1 | tee publish.log
 
-      - name: Locate built framework
+      - name: Show published artifacts
         if: always()
         run: |
-          echo "=== Searching for any .framework directory ==="
-          find . -name "*.framework" -type d 2>/dev/null | head -20
-          echo "=== Expected module path ==="
-          ls -la compose/ui/ui/build/bin/iosArm64/debugFramework/ 2>/dev/null || echo "Path not found"
+          echo "=== .m2/repository/org/jetbrains/compose ==="
+          ls -la ~/.m2/repository/org/jetbrains/compose/ 2>/dev/null || echo "not found"
+          echo "=== Search for ios12 klibs ==="
+          find ~/.m2/repository -name "*1.0.0-ios12*" 2>/dev/null | head -30
 
-      - name: Upload framework
+      - name: Pack Maven repo
+        if: always()
+        run: |
+          tar -czf m2-ios12.tar.gz -C ~/.m2/repository .
+
+      - name: Upload Maven repo
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: compose-ui-framework
-          path: |
-            compose/ui/ui/build/bin/iosArm64/debugFramework/**/*.framework/**
-            compose/ui/ui/build/bin/iosArm64/debugFramework/*.framework
+          name: m2-ios12-repo
+          path: m2-ios12.tar.gz
           if-no-files-found: error
 
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
-          path: compose-ui-build.log
+          name: publish-logs
+          path: publish.log
