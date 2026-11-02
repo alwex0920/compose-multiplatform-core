@@ -23,16 +23,25 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Show versions
-        run: |
-          xcodebuild -version
-          xcrun --sdk iphoneos --show-sdk-version
-          ./gradlew --version
-
-      - name: Build Compose UI framework for iOS (arm64 device)
+      - name: Build Compose UI framework (device arm64)
         run: |
           ./gradlew :compose:ui:ui:linkDebugFrameworkIosArm64 --stacktrace 2>&1 | tee compose-ui-build.log
         continue-on-error: true
+
+      - name: Locate built framework
+        if: always()
+        run: |
+          echo "=== Searching for ComposeUI.framework ==="
+          find . -name "*.framework" -type d 2>/dev/null | head -20
+
+      - name: Upload framework
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-ui-framework
+          path: |
+            **/build/bin/iosArm64/debugFramework/**/*.framework/**
+          if-no-files-found: warn
 
       - name: Upload logs
         if: always()
