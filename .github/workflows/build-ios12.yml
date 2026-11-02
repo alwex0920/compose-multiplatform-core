@@ -7,10 +7,17 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
-    timeout-minutes: 120
+    runs-on: macos-15
+    timeout-minutes: 180
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 'latest-stable'
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -19,16 +26,12 @@ jobs:
       - name: Show versions
         run: |
           xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
           ./gradlew --version
 
-      - name: Build Compose UI framework for iOS (correct path)
+      - name: Build Compose UI framework for iOS (arm64 device)
         run: |
           ./gradlew :compose:ui:ui:linkDebugFrameworkIosArm64 --stacktrace 2>&1 | tee compose-ui-build.log
-        continue-on-error: true
-
-      - name: Build XCFramework for iOS (correct path)
-        run: |
-          ./gradlew :compose:ui:ui:assembleDebugXCFramework --stacktrace 2>&1 | tee xcframework-build.log
         continue-on-error: true
 
       - name: Upload logs
@@ -36,6 +39,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-logs
-          path: |
-            compose-ui-build.log
-            xcframework-build.log
+          path: compose-ui-build.log
