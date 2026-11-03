@@ -24,11 +24,11 @@
 // only selector references, which the Objective-C runtime resolves. Enum constants and types are
 // resolved at compile time and don't contribute any symbols, so they are used as is.
 @protocol CMPUIViewLayoutRegionFactory <NSObject>
-+ (id)marginsLayoutRegionWithCornerAdaptation:(UIViewLayoutRegionAdaptivityAxis)axis
++ (id)marginsLayoutRegionWithCornerAdaptation:(CMPLayoutRegionAdaptivityAxis)axis
     API_AVAILABLE(ios(26.0));
-+ (id)readableContentLayoutRegionWithCornerAdaptation:(UIViewLayoutRegionAdaptivityAxis)axis
++ (id)readableContentLayoutRegionWithCornerAdaptation:(CMPLayoutRegionAdaptivityAxis)axis
     API_AVAILABLE(ios(26.0));
-+ (id)safeAreaLayoutRegionWithCornerAdaptation:(UIViewLayoutRegionAdaptivityAxis)axis
++ (id)safeAreaLayoutRegionWithCornerAdaptation:(CMPLayoutRegionAdaptivityAxis)axis
     API_AVAILABLE(ios(26.0));
 @end
 
@@ -105,16 +105,16 @@ typedef NS_ENUM(NSInteger, CMPLayoutRegionKind) {
         return [self edgeInsetsFallbackInView: view];
     }
 
-    UIViewLayoutRegionAdaptivityAxis axis;
+    CMPLayoutRegionAdaptivityAxis axis;
     switch (_axis) {
         case CMPLayoutRegionAdaptivityAxisNone:
-            axis = UIViewLayoutRegionAdaptivityAxisNone;
+            axis = CMPLayoutRegionAdaptivityAxisNone;
             break;
         case CMPLayoutRegionAdaptivityAxisHorizontal:
-            axis = UIViewLayoutRegionAdaptivityAxisHorizontal;
+            axis = CMPLayoutRegionAdaptivityAxisHorizontal;
             break;
         case CMPLayoutRegionAdaptivityAxisVertical:
-            axis = UIViewLayoutRegionAdaptivityAxisVertical;
+            axis = CMPLayoutRegionAdaptivityAxisVertical;
             break;
     }
 
