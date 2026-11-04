@@ -48,6 +48,8 @@ import platform.UIKit.UIColor
 import platform.UIKit.UIDragInteraction
 import platform.UIKit.UIDragInteractionDelegateProtocol
 import platform.UIKit.UIDragItem
+import platform.UIKit.UIDragPreviewParameters   // ← было: UIPreviewParameters
+import platform.UIKit.UIDragPreviewTarget       // ← было: UIPreviewTarget
 import platform.UIKit.UIDragSessionProtocol
 import platform.UIKit.UIDropInteraction
 import platform.UIKit.UIDropInteractionDelegateProtocol
@@ -58,8 +60,6 @@ import platform.UIKit.UIDropProposal
 import platform.UIKit.UIDropSessionProtocol
 import platform.UIKit.UIImageView
 import platform.UIKit.UILongPressGestureRecognizer
-import platform.UIKit.UIPreviewParameters
-import platform.UIKit.UIPreviewTarget
 import platform.UIKit.UITargetedDragPreview
 import platform.UIKit.UIView
 import platform.UIKit.UIViewContentMode
@@ -125,9 +125,9 @@ private class DragSessionContext(
                 decorationView.contentMode = UIViewContentMode.UIViewContentModeScaleToFill
             }
 
-        val parameters = UIPreviewParameters()
+        val parameters = UIDragPreviewParameters()   // ← было: UIPreviewParameters()
         val cornerRadius = decorationCgRect.useContents {
-            minOf(size.width / 2.0, size.height  / 2.0, 4.0)
+            minOf(size.width / 2.0, size.height / 2.0, 4.0)
         }
         val path = UIBezierPath.bezierPathWithRoundedRect(decorationCgRect.useContents {
             CGRectMake(0.0, 0.0, size.width, size.height)
@@ -138,7 +138,7 @@ private class DragSessionContext(
         val preview = UITargetedDragPreview(
             view = decorationView,
             parameters = parameters,
-            target = UIPreviewTarget(
+            target = UIDragPreviewTarget(                  // ← было: UIPreviewTarget
                 container = view,
                 center = session.locationInView(view),
                 transform = CGAffineTransformIdentity.readValue()
